@@ -1,133 +1,81 @@
+﻿import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { format, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+
+const metricCards = [
+  { title: 'Total Balance', key: 'balance', prefix: '$', format: (value) => value.toFixed(2) },
+  { title: 'Income', key: 'income', prefix: '$', format: (value) => value.toFixed(2) },
+  { title: 'Expenses', key: 'expense', prefix: '$', format: (value) => value.toFixed(2) },
+  { title: 'Active Categories', key: 'categories', suffix: '' },
+];
 
 const Insights = () => {
   const transactions = useSelector((state) => state.transactions.list);
 
-  // Highest spending category
-  const expenseCategories = {};
-  transactions.filter(t => t.type === 'expense').forEach(t => {
-    expenseCategories[t.category] = (expenseCategories[t.category] || 0) + Math.abs(t.amount);
-  });
-  const highestCategory = Object.entries(expenseCategories).reduce((max, [cat, amt]) =>
-    amt > max.amount ? { category: cat, amount: amt } : max,
-    { category: 'None', amount: 0 }
-  );
+  const summary = useMemo(() => {
+    const totals = transactions.reduce(
+      (acc, transaction) => {
+        const amount = Number(transaction.amount) || 0;
+        if (transaction.type === 'income') {
+          acc.income += amount;
+        } else {
+          acc.expense += Math.abs(amount);
+        }
+        acc.balance += amount;
+        acc.categories.add(transaction.category);
+        return acc;
+      },
+      { income: 0, expense: 0, balance: 0, categories: new Set() }
+    );
 
-  // Monthly comparison (current vs previous month)
-  const now = new Date();
-  const currentMonth = {
-    start: startOfMonth(now),
-    end: endOfMonth(now),
-  };
-  const prevMonth = {
-    start: startOfMonth(new Date(now.getFullYear(), now.getMonth() - 1, 1)),
-    end: endOfMonth(new Date(now.getFullYear(), now.getMonth() - 1, 1)),
-  };
+    return {
+      balance: totals.balance,
+      income: totals.income,
+      expense: totals.expense,
+      categories: totals.categories.size,
+    };
+  }, [transactions]);
 
-  const currentIncome = transactions.filter(t =>
-    t.type === 'income' && isWithinInterval(new Date(t.date), currentMonth)
-  ).reduce((sum, t) => sum + t.amount, 0);
-
-  const currentExpenses = transactions.filter(t =>
-    t.type === 'expense' && isWithinInterval(new Date(t.date), currentMonth)
-  ).reduce((sum, t) => sum + Math.abs(t.amount), 0);
-
-  const prevIncome = transactions.filter(t =>
-    t.type === 'income' && isWithinInterval(new Date(t.date), prevMonth)
-  ).reduce((sum, t) => sum + t.amount, 0);
-
-  const prevExpenses = transactions.filter(t =>
-    t.type === 'expense' && isWithinInterval(new Date(t.date), prevMonth)
-  ).reduce((sum, t) => sum + Math.abs(t.amount), 0);
-
-  const incomeChange = prevIncome ? ((currentIncome - prevIncome) / prevIncome * 100).toFixed(1) : 0;
-  const expenseChange = prevExpenses ? ((currentExpenses - prevExpenses) / prevExpenses * 100).toFixed(1) : 0;
-
-  // Average transaction amount
-  const avgTransaction = transactions.length > 0 ?
-    transactions.reduce((sum, t) => sum + Math.abs(t.amount), 0) / transactions.length : 0;
+  const chartData = useMemo(() => {
+    return [...transactions]
+      .sort((a, b) => new Date(a.date) - new Date(b.date))
+      .map((transaction) => ({
+        date: new Date(transaction.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        amount: Number(transaction.amount),
+      }))
+      .slice(-10);
+  }, [transactions]);
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Financial Insights</h2>
-        <p className="text-gray-600 dark:text-gray-400">Key metrics and observations from your data</p>
+    <div className="space-y-6 bg-slate-50 dark:bg-slate-950 min-h-full p-6">
+      <div className="grid gap-6 lg:grid-cols-4">
+        {metricCards.map((card) => (
+          <div key={card.key} className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+            <p className="text-sm font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">{card.title}</p>
+            <p className="mt-4 text-3xl font-semibold text-slate-900 dark:text-white">
+              {card.prefix || ''}{card.format ? card.format(summary[card.key]) : summary[card.key]}{card.suffix || ''}
+            </p>
+          </div>
+        ))}
       </div>
 
-      {/* Insights Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Highest Spending</h3>
-            <div className="w-10 h-10 bg-fourth bg-opacity-10 rounded-lg flex items-center justify-center">
-              <span className="text-fourth text-xl">💸</span>
-            </div>
+      <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+        <div className="flex items-center justify-between gap-4 pb-4">
+          <div>
+            <h2 className="text-2xl font-semibold text-slate-900 dark:text-white">Performance Overview</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Recent transaction trend for the last 10 entries.</p>
           </div>
-          <p className="text-2xl font-bold text-fourth mb-1">{highestCategory.category}</p>
-          <p className="text-sm text-tertiary">${highestCategory.amount.toFixed(2)} spent</p>
         </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Income Trend</h3>
-            <div className="w-10 h-10 bg-secondary bg-opacity-10 rounded-lg flex items-center justify-center">
-              <span className="text-secondary text-xl">📈</span>
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-secondary mb-1">${currentIncome.toFixed(2)}</p>
-          <p className={`text-sm ${incomeChange >= 0 ? 'text-secondary' : 'text-fourth'}`}>
-            {incomeChange}% vs last month
-          </p>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Expense Trend</h3>
-            <div className="w-10 h-10 bg-fourth bg-opacity-10 rounded-lg flex items-center justify-center">
-              <span className="text-fourth text-xl">📉</span>
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-fourth mb-1">${currentExpenses.toFixed(2)}</p>
-          <p className={`text-sm ${expenseChange <= 0 ? 'text-secondary' : 'text-fourth'}`}>
-            {expenseChange}% vs last month
-          </p>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Avg Transaction</h3>
-            <div className="w-10 h-10 bg-primary bg-opacity-10 rounded-lg flex items-center justify-center">
-              <span className="text-primary text-xl">💵</span>
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-primary mb-1">${avgTransaction.toFixed(2)}</p>
-          <p className="text-sm text-tertiary">Across all transactions</p>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Total Transactions</h3>
-            <div className="w-10 h-10 bg-primary bg-opacity-10 rounded-lg flex items-center justify-center">
-              <span className="text-primary text-xl">📊</span>
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-primary mb-1">{transactions.length}</p>
-          <p className="text-sm text-tertiary">In your history</p>
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Savings Rate</h3>
-            <div className="w-10 h-10 bg-secondary bg-opacity-10 rounded-lg flex items-center justify-center">
-              <span className="text-secondary text-xl">🎯</span>
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-secondary mb-1">
-            {currentIncome > 0 ? ((currentIncome - currentExpenses) / currentIncome * 100).toFixed(1) : 0}%
-          </p>
-          <p className="text-sm text-tertiary">This month</p>
+        <div className="h-72">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
+              <XAxis dataKey="date" tick={{ fill: '#64748B', fontSize: 12 }} />
+              <YAxis tick={{ fill: '#64748B', fontSize: 12 }} />
+              <Tooltip contentStyle={{ borderRadius: '1rem', border: '1px solid #CBD5E1', backgroundColor: '#0F172A', color: '#fff' }} />
+              <Line type="monotone" dataKey="amount" stroke="#2563EB" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>

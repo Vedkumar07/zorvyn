@@ -1,112 +1,164 @@
-import { useSelector } from 'react-redux';
+﻿import { useSelector } from 'react-redux';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { format } from 'date-fns';
+
+const summaryCards = [
+  { label: 'Total Balance', valueKey: 'balance', accent: 'text-secondary' },
+  { label: 'Total Income', valueKey: 'income', accent: 'text-secondary' },
+  { label: 'Total Expenses', valueKey: 'expenses', accent: 'text-fourth' },
+];
+
+const StatCard = ({ label, value, accent, hint }) => (
+  <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm hover:shadow-md transition">
+    <div className="flex items-center justify-between mb-4">
+      <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{label}</h2>
+      <div className="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400">•</div>
+    </div>
+    <p className={`text-3xl font-semibold ${accent}`}>{value}</p>
+    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{hint}</p>
+  </div>
+);
 
 const Dashboard = () => {
   const transactions = useSelector((state) => state.transactions.list);
 
   const totalBalance = transactions.reduce((sum, t) => sum + t.amount, 0);
-  const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-  const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + Math.abs(t.amount), 0);
+  const totalIncome = transactions.filter((t) => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+  const totalExpenses = transactions.filter((t) => t.type === 'expense').reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
-  const sortedTransactions = [...transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
-  let cumulativeBalance = 0;
-  const balanceTrend = sortedTransactions.map(t => {
-    cumulativeBalance += t.amount;
-    return { date: format(new Date(t.date), 'MMM dd'), balance: cumulativeBalance };
-  });
+  const balanceTrend = [...transactions]
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
+    .reduce((acc, t) => {
+      const lastBalance = acc.length ? acc[acc.length - 1].balance : 0;
+      acc.push({ date: format(new Date(t.date), 'MMM dd'), balance: lastBalance + t.amount });
+      return acc;
+    }, []);
 
-  const expenseCategories = {};
-  transactions.filter(t => t.type === 'expense').forEach(t => {
-    expenseCategories[t.category] = (expenseCategories[t.category] || 0) + Math.abs(t.amount);
-  });
-  const spendingData = Object.entries(expenseCategories).map(([category, amount]) => ({ name: category, value: amount }));
+  const spendingData = Object.entries(
+    transactions.reduce((acc, t) => {
+      if (t.type === 'expense') {
+        acc[t.category] = (acc[t.category] || 0) + Math.abs(t.amount);
+      }
+      return acc;
+    }, {})
+  ).map(([name, value]) => ({ name, value }));
 
-  const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
+  const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
+
+  const stats = {
+    balance: `$${totalBalance.toFixed(2)}`,
+    income: `$${totalIncome.toFixed(2)}`,
+    expenses: `$${totalExpenses.toFixed(2)}`,
+  };
 
   const recentTransactions = [...transactions]
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .slice(0, 5);
 
   return (
-    <div className="p-6 space-y-6 min-h-full bg-gray-50 dark:bg-gray-950">
-      {/* Summary Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard label="Balance" value={`$${totalBalance.toFixed(2)}`} color={totalBalance >= 0 ? 'text-secondary' : 'text-fourth'} />
-        <StatCard label="Income" value={`$${totalIncome.toLocaleString()}`} color="text-secondary" />
-        <StatCard label="Expenses" value={`$${totalExpenses.toLocaleString()}`} color="text-fourth" />
-        <StatCard label="Transactions" value={transactions.length} color="text-primary" />
+    <div className="space-y-6 bg-slate-50 dark:bg-slate-950 min-h-full p-6">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+        <h1 className="text-3xl font-semibold text-slate-900 dark:text-white">Dashboard Overview</h1>
+        <p className="text-slate-500 dark:text-slate-400 mt-2">Track your financial health with a clean summary.</p>
       </div>
 
-      {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Balance Trend</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {summaryCards.map((card) => (
+          <StatCard
+            key={card.label}
+            label={card.label}
+            value={stats[card.valueKey]}
+            accent={card.accent}
+            hint={card.label === 'Total Expenses' ? 'This month' : 'Current period'}
+          />
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Balance Trend</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Monthly balance movement</p>
+            </div>
+            <span className="text-sm text-slate-500 dark:text-slate-400">Line Chart</span>
+          </div>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={balanceTrend} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
-              <XAxis dataKey="date" stroke="#9CA3AF" fontSize={12} />
-              <YAxis stroke="#9CA3AF" fontSize={12} />
-              <Tooltip formatter={(value) => [`$${value}`, 'Balance']} />
-              <Line
-                type="monotone"
-                dataKey="balance"
-                stroke="var(--primary)"
-                strokeWidth={2.5}
-                dot={false}
-                activeDot={{ r: 5 }}
-              />
+            <LineChart data={balanceTrend}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
+              <XAxis dataKey="date" stroke="#64748B" tick={{ fontSize: 11 }} />
+              <YAxis stroke="#64748B" tick={{ fontSize: 11 }} />
+              <Tooltip contentStyle={{ borderRadius: 16, boxShadow: '0 10px 30px rgba(15,23,42,0.08)' }} formatter={(value) => [`$${value.toFixed(2)}`, 'Balance']} />
+              <Line type="monotone" dataKey="balance" stroke="#3B82F6" strokeWidth={3} dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Spending by Category</h2>
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Spending Breakdown</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Expense categories at a glance</p>
+            </div>
+            <span className="text-sm text-slate-500 dark:text-slate-400">Pie Chart</span>
+          </div>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
-              <Pie data={spendingData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={2} dataKey="value">
+              <Pie data={spendingData} dataKey="value" cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={3}>
                 {spendingData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
+              <Tooltip contentStyle={{ borderRadius: 16, boxShadow: '0 10px 30px rgba(15,23,42,0.08)' }} formatter={(value) => [`$${value.toFixed(2)}`, 'Spent']} />
             </PieChart>
           </ResponsiveContainer>
+          <div className="grid grid-cols-2 gap-3 mt-5">
+            {spendingData.map((entry, index) => (
+              <div key={entry.name} className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
+                <span className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                <span>{entry.name}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Recent Transactions */}
-      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Recent Transactions</h3>
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Recent Transactions</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Latest activity from your financial history.</p>
+          </div>
+          <span className="text-sm text-slate-500 dark:text-slate-400">Top 5</span>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Description</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Type</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Amount</th>
+          <table className="w-full min-w-[680px] text-left">
+            <thead className="bg-slate-50 dark:bg-slate-800">
+              <tr>
+                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Date</th>
+                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Category</th>
+                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Type</th>
+                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Amount</th>
+                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Description</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-              {recentTransactions.map((t) => (
-                <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                  <td className="px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">{t.description}</td>
-                  <td className="px-6 py-3">
-                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-                      t.type === 'income' ? 'bg-secondary/10 text-secondary' : 'bg-fourth/10 text-fourth'
-                    }`}>
-                      {t.type === 'income' ? '▲' : '▼'} {t.type}
-                    </span>
+            <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+              {recentTransactions.map((transaction) => (
+                <tr key={transaction.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                  <td className="px-5 py-4 text-sm text-slate-900 dark:text-slate-100">{format(new Date(transaction.date), 'MMM dd, yyyy')}</td>
+                  <td className="px-5 py-4 text-sm text-slate-900 dark:text-slate-100">{transaction.category}</td>
+                  <td className="px-5 py-4 text-sm capitalize text-slate-900 dark:text-slate-100">{transaction.type}</td>
+                  <td className={`px-5 py-4 text-sm font-semibold ${transaction.type === 'income' ? 'text-green-600' : 'text-red-500'}`}>
+                    ${Math.abs(transaction.amount).toFixed(2)}
                   </td>
-                  <td className="px-6 py-3 text-xs text-gray-600 dark:text-gray-400">{format(new Date(t.date), 'MMM dd')}</td>
-                  <td className={`px-6 py-3 text-sm font-bold ${t.type === 'income' ? 'text-secondary' : 'text-fourth'}`}>
-                    {t.type === 'income' && '+'}{t.amount.toFixed(2)}
-                  </td>
+                  <td className="px-5 py-4 text-sm text-slate-500 dark:text-slate-400">{transaction.description}</td>
                 </tr>
               ))}
+              {recentTransactions.length === 0 && (
+                <tr>
+                  <td colSpan="5" className="px-5 py-8 text-center text-sm text-slate-500 dark:text-slate-400">No recent transactions available.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -114,19 +166,5 @@ const Dashboard = () => {
     </div>
   );
 };
-
-const StatCard = ({ label, value, color }) => (
-  <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-4 hover:shadow-md transition-shadow">
-    <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide mb-2">{label}</p>
-    <p className={`text-2xl font-bold ${color}`}>{value}</p>
-  </div>
-);
-
-const StatPill = ({ label, value, color = '' }) => (
-  <div className="flex items-center gap-2">
-    <span className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">{label}</span>
-    <span className={`text-lg font-bold ${color || 'text-gray-900 dark:text-white'}`}>{value}</span>
-  </div>
-);
 
 export default Dashboard;

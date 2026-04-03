@@ -5,6 +5,12 @@ import Dashboard from './components/Dashboard';
 import Transactions from './components/Transactions';
 import Insights from './components/Insights';
 
+const navItems = [
+  { id: 'dashboard', label: 'Dashboard', icon: '▣' },
+  { id: 'transactions', label: 'Transactions', icon: '💳' },
+  { id: 'insights', label: 'Insights', icon: '📈' },
+];
+
 const App = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('darkMode') === 'true');
@@ -12,108 +18,89 @@ const App = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    localStorage.setItem('darkMode', darkMode);
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    document.documentElement.classList.toggle('dark', darkMode);
+    localStorage.setItem('darkMode', darkMode.toString());
   }, [darkMode]);
-
-  const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'transactions', label: 'Transactions', icon: '💳' },
-    { id: 'insights', label: 'Insights', icon: '📈' },
-  ];
 
   return (
     <div className={darkMode ? 'dark' : ''}>
-      <div className="flex h-screen bg-gray-50 dark:bg-gray-950 font-sans overflow-hidden">
-        {/* Sidebar */}
-        <aside className="w-56 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 flex flex-col flex-shrink-0 shadow-sm">
-          {/* Logo */}
-          <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold">
-                Z
+      <div className="flex h-screen bg-gray-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+        <aside className="w-60 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col">
+          <div className="px-6 py-5 border-b border-slate-200 dark:border-slate-800">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white font-bold">Z</div>
+              <div>
+                <p className="text-base font-semibold">Zorvyn</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Finance Dashboard</p>
               </div>
-              <span className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">Zorvyn</span>
             </div>
           </div>
 
-          {/* Search */}
           <div className="px-4 py-4">
-            <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2">
-              <span className="text-gray-400 text-sm">🔍</span>
-              <span className="text-sm text-gray-400">Search...</span>
-              <span className="ml-auto text-xs text-gray-300 dark:text-gray-600">⌘K</span>
+            <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-3 py-2 text-sm text-slate-500 dark:text-slate-400">
+              <span>🔍</span>
+              <span className="flex-1">Search...</span>
+              <span className="text-xs text-slate-400">⌘K</span>
             </div>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 px-3 space-y-0.5">
-            {navItems.map(item => (
+          <nav className="flex-1 px-3 space-y-2">
+            {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-medium transition ${
                   activeTab === item.id
-                    ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
-                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                    ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
+                <span>{item.icon}</span>
                 {item.label}
               </button>
             ))}
           </nav>
 
-          {/* Bottom Controls */}
-          <div className="px-4 py-4 border-t border-gray-100 dark:border-gray-800 space-y-3">
-            {/* Role Switcher */}
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-1 flex gap-1">
-              {['viewer', 'admin'].map(r => (
+          <div className="px-4 py-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
+            <div className="bg-slate-50 dark:bg-slate-800 rounded-2xl p-1 grid grid-cols-2 gap-1">
+              {['viewer', 'admin'].map((roleKey) => (
                 <button
-                  key={r}
-                  onClick={() => dispatch(setRole(r))}
-                  className={`flex-1 py-1.5 text-xs font-medium rounded-md capitalize transition-all ${
-                    role === r
-                      ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                      : 'text-gray-500 dark:text-gray-400'
+                  key={roleKey}
+                  onClick={() => dispatch(setRole(roleKey))}
+                  className={`py-2 text-xs font-semibold rounded-2xl transition ${
+                    role === roleKey
+                      ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                      : 'text-slate-500 dark:text-slate-400'
                   }`}
                 >
-                  {r}
+                  {roleKey}
                 </button>
               ))}
             </div>
 
-            {/* Dark Mode */}
             <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              onClick={() => setDarkMode((value) => !value)}
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
             >
-              {darkMode ? '☀️' : '🌙'}
               {darkMode ? 'Light Mode' : 'Dark Mode'}
             </button>
 
-            {/* User Info */}
-            <div className="flex items-center gap-2.5 px-3 py-2">
-              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-xs font-bold">
-                {role === 'admin' ? 'A' : 'V'}
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-900 dark:text-white capitalize">{role}</p>
-                <p className="text-xs text-gray-400">{role === 'admin' ? 'Full Access' : 'Read Only'}</p>
+            <div className="flex items-center gap-3 px-3 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800">
+              <div className="w-9 h-9 rounded-2xl bg-blue-600 text-white flex items-center justify-center">{role === 'admin' ? 'A' : 'V'}</div>
+              <div className="text-xs leading-4">
+                <p className="font-semibold capitalize text-slate-900 dark:text-white">{role}</p>
+                <p className="text-slate-500 dark:text-slate-400">{role === 'admin' ? 'Full access' : 'Read only'}</p>
               </div>
             </div>
           </div>
         </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto">
-          {activeTab === 'dashboard' && <Dashboard />}
-          {activeTab === 'transactions' && <Transactions />}
-          {activeTab === 'insights' && <Insights />}
+        <main className="flex-1 overflow-y-auto p-6">
+          <div className="max-w-7xl mx-auto">
+            {activeTab === 'dashboard' && <Dashboard />}
+            {activeTab === 'transactions' && <Transactions />}
+            {activeTab === 'insights' && <Insights />}
+          </div>
         </main>
       </div>
     </div>
