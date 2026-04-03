@@ -5,163 +5,128 @@ import { format } from 'date-fns';
 const Dashboard = () => {
   const transactions = useSelector((state) => state.transactions.list);
 
-  // Calculate totals
   const totalBalance = transactions.reduce((sum, t) => sum + t.amount, 0);
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
   const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
-  // Balance trend data
   const sortedTransactions = [...transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
   let cumulativeBalance = 0;
   const balanceTrend = sortedTransactions.map(t => {
     cumulativeBalance += t.amount;
-    return {
-      date: format(new Date(t.date), 'MMM dd'),
-      balance: cumulativeBalance,
-    };
+    return { date: format(new Date(t.date), 'MMM dd'), balance: cumulativeBalance };
   });
 
-  // Spending breakdown by category
   const expenseCategories = {};
   transactions.filter(t => t.type === 'expense').forEach(t => {
     expenseCategories[t.category] = (expenseCategories[t.category] || 0) + Math.abs(t.amount);
   });
-  const spendingData = Object.entries(expenseCategories).map(([category, amount]) => ({
-    name: category,
-    value: amount,
-  }));
+  const spendingData = Object.entries(expenseCategories).map(([category, amount]) => ({ name: category, value: amount }));
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+  const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
+
+  const recentTransactions = [...transactions]
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 5);
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Dashboard Overview</h1>
-        <p className="text-gray-600 dark:text-gray-400">Track your financial health at a glance</p>
+    <div className="p-6 space-y-6 min-h-full bg-gray-50 dark:bg-gray-950">
+      {/* Summary Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <StatCard label="Balance" value={`$${totalBalance.toFixed(2)}`} color={totalBalance >= 0 ? 'text-secondary' : 'text-fourth'} />
+        <StatCard label="Income" value={`$${totalIncome.toLocaleString()}`} color="text-secondary" />
+        <StatCard label="Expenses" value={`$${totalExpenses.toLocaleString()}`} color="text-fourth" />
+        <StatCard label="Transactions" value={transactions.length} color="text-primary" />
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Total Balance</h2>
-            <div className="w-10 h-10 bg-primary bg-opacity-10 rounded-lg flex items-center justify-center">
-              <span className="text-primary text-xl">💰</span>
-            </div>
-          </div>
-          <p className={`text-3xl font-bold ${totalBalance >= 0 ? 'text-secondary' : 'text-fourth'}`}>
-            ${totalBalance.toFixed(2)}
-          </p>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Current balance</p>
-        </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Total Income</h2>
-            <div className="w-10 h-10 bg-secondary bg-opacity-10 rounded-lg flex items-center justify-center">
-              <span className="text-secondary text-xl">📈</span>
-            </div>
-          </div>
-          <p className="text-3xl font-bold text-secondary">${totalIncome.toFixed(2)}</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">This month</p>
-        </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Total Expenses</h2>
-            <div className="w-10 h-10 bg-fourth bg-opacity-10 rounded-lg flex items-center justify-center">
-              <span className="text-fourth text-xl">📉</span>
-            </div>
-          </div>
-          <p className="text-3xl font-bold text-fourth">${totalExpenses.toFixed(2)}</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">This month</p>
-        </div>
-      </div>
-
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Balance Trend */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Balance Trend</h2>
-            <div className="w-8 h-8 bg-primary bg-opacity-10 rounded-lg flex items-center justify-center">
-              <span className="text-primary text-sm">📊</span>
-            </div>
-          </div>
+      {/* Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Balance Trend</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={balanceTrend}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-              <XAxis dataKey="date" stroke="#6B7280" fontSize={12} />
-              <YAxis stroke="#6B7280" fontSize={12} />
-              <Tooltip
-                formatter={(value) => [`$${value}`, 'Balance']}
-                contentStyle={{
-                  backgroundColor: '#F9FAFB',
-                  border: '1px solid #E5E7EB',
-                  borderRadius: '8px',
-                  color: '#111827'
-                }}
-              />
+            <LineChart data={balanceTrend} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
+              <XAxis dataKey="date" stroke="#9CA3AF" fontSize={12} />
+              <YAxis stroke="#9CA3AF" fontSize={12} />
+              <Tooltip formatter={(value) => [`$${value}`, 'Balance']} />
               <Line
                 type="monotone"
                 dataKey="balance"
-                stroke="#3B82F6"
-                strokeWidth={3}
-                dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
-                activeDot={{ r: 6, stroke: '#3B82F6', strokeWidth: 2 }}
+                stroke="var(--primary)"
+                strokeWidth={2.5}
+                dot={false}
+                activeDot={{ r: 5 }}
               />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Spending Breakdown */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Spending Breakdown</h2>
-            <div className="w-8 h-8 bg-primary bg-opacity-10 rounded-lg flex items-center justify-center">
-              <span className="text-primary text-sm">🥧</span>
-            </div>
-          </div>
+        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Spending by Category</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
-              <Pie
-                data={spendingData}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={100}
-                paddingAngle={2}
-                dataKey="value"
-              >
+              <Pie data={spendingData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={2} dataKey="value">
                 {spendingData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip
-                formatter={(value) => [`$${value}`, 'Amount']}
-                contentStyle={{
-                  backgroundColor: '#F9FAFB',
-                  border: '1px solid #E5E7EB',
-                  borderRadius: '8px',
-                  color: '#111827'
-                }}
-              />
+              <Tooltip formatter={(value) => `$${value.toFixed(2)}`} />
             </PieChart>
           </ResponsiveContainer>
-          <div className="flex flex-wrap justify-center gap-4 mt-4">
-            {spendingData.map((entry, index) => (
-              <div key={entry.name} className="flex items-center space-x-2">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                ></div>
-                <span className="text-sm text-gray-600 dark:text-gray-400">{entry.name}</span>
-              </div>
-            ))}
-          </div>
+        </div>
+      </div>
+
+      {/* Recent Transactions */}
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Recent Transactions</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Description</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Type</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Date</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Amount</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+              {recentTransactions.map((t) => (
+                <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                  <td className="px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">{t.description}</td>
+                  <td className="px-6 py-3">
+                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+                      t.type === 'income' ? 'bg-secondary/10 text-secondary' : 'bg-fourth/10 text-fourth'
+                    }`}>
+                      {t.type === 'income' ? '▲' : '▼'} {t.type}
+                    </span>
+                  </td>
+                  <td className="px-6 py-3 text-xs text-gray-600 dark:text-gray-400">{format(new Date(t.date), 'MMM dd')}</td>
+                  <td className={`px-6 py-3 text-sm font-bold ${t.type === 'income' ? 'text-secondary' : 'text-fourth'}`}>
+                    {t.type === 'income' && '+'}{t.amount.toFixed(2)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   );
 };
+
+const StatCard = ({ label, value, color }) => (
+  <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm p-4 hover:shadow-md transition-shadow">
+    <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide mb-2">{label}</p>
+    <p className={`text-2xl font-bold ${color}`}>{value}</p>
+  </div>
+);
+
+const StatPill = ({ label, value, color = '' }) => (
+  <div className="flex items-center gap-2">
+    <span className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">{label}</span>
+    <span className={`text-lg font-bold ${color || 'text-gray-900 dark:text-white'}`}>{value}</span>
+  </div>
+);
 
 export default Dashboard;

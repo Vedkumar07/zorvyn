@@ -1,93 +1,123 @@
 import { useState, useEffect } from 'react';
-import RoleSwitcher from './components/RoleSwitcher';
+import { useSelector, useDispatch } from 'react-redux';
+import { setRole } from './store/slices/roleSlice';
 import Dashboard from './components/Dashboard';
 import Transactions from './components/Transactions';
 import Insights from './components/Insights';
 
-function App() {
+const App = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [isDark, setIsDark] = useState(() => {
-    const saved = localStorage.getItem('darkMode');
-    return saved === 'true';
-  });
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('darkMode') === 'true');
+  const role = useSelector((state) => state.role.currentRole);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    if (isDark) {
+    localStorage.setItem('darkMode', darkMode);
+    if (darkMode) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
-  }, [isDark]);
+  }, [darkMode]);
 
-  useEffect(() => {
-    localStorage.setItem('darkMode', isDark.toString());
-  }, [isDark]);
-
-  const toggleDarkMode = () => {
-    setIsDark(!isDark);
-  };
-
-  const tabs = [
+  const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
     { id: 'transactions', label: 'Transactions', icon: '💳' },
     { id: 'insights', label: 'Insights', icon: '📈' },
   ];
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white dark:bg-gray-800 shadow-lg border-r border-gray-200 dark:border-gray-700 flex flex-col">
-        {/* Header */}
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <h1 className="text-2xl font-bold text-primary">Finance Dashboard</h1>
-        </div>
+    <div className={darkMode ? 'dark' : ''}>
+      <div className="flex h-screen bg-gray-50 dark:bg-gray-950 font-sans overflow-hidden">
+        {/* Sidebar */}
+        <aside className="w-56 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 flex flex-col flex-shrink-0 shadow-sm">
+          {/* Logo */}
+          <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold">
+                Z
+              </div>
+              <span className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">Zorvyn</span>
+            </div>
+          </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 p-4">
-          <ul className="space-y-2">
-            {tabs.map(tab => (
-              <li key={tab.id}>
+          {/* Search */}
+          <div className="px-4 py-4">
+            <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2">
+              <span className="text-gray-400 text-sm">🔍</span>
+              <span className="text-sm text-gray-400">Search...</span>
+              <span className="ml-auto text-xs text-gray-300 dark:text-gray-600">⌘K</span>
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 px-3 space-y-0.5">
+            {navItems.map(item => (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                  activeTab === item.id
+                    ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <span className="text-lg">{item.icon}</span>
+                {item.label}
+              </button>
+            ))}
+          </nav>
+
+          {/* Bottom Controls */}
+          <div className="px-4 py-4 border-t border-gray-100 dark:border-gray-800 space-y-3">
+            {/* Role Switcher */}
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-1 flex gap-1">
+              {['viewer', 'admin'].map(r => (
                 <button
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors ${
-                    activeTab === tab.id
-                      ? 'bg-primary text-white shadow-md'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  key={r}
+                  onClick={() => dispatch(setRole(r))}
+                  className={`flex-1 py-1.5 text-xs font-medium rounded-md capitalize transition-all ${
+                    role === r
+                      ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                      : 'text-gray-500 dark:text-gray-400'
                   }`}
                 >
-                  <span className="text-lg">{tab.icon}</span>
-                  <span className="font-medium">{tab.label}</span>
+                  {r}
                 </button>
-              </li>
-            ))}
-          </ul>
-        </nav>
+              ))}
+            </div>
 
-        {/* Footer */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Theme</span>
+            {/* Dark Mode */}
             <button
-              onClick={toggleDarkMode}
-              className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors font-medium"
+              onClick={() => setDarkMode(!darkMode)}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
-              {isDark ? 'Switch to Light' : 'Switch to Dark'}
+              {darkMode ? '☀️' : '🌙'}
+              {darkMode ? 'Light Mode' : 'Dark Mode'}
             </button>
-          </div>
-          <RoleSwitcher />
-        </div>
-      </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto p-6">
-        <div className="max-w-7xl mx-auto">
+            {/* User Info */}
+            <div className="flex items-center gap-2.5 px-3 py-2">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-xs font-bold">
+                {role === 'admin' ? 'A' : 'V'}
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-900 dark:text-white capitalize">{role}</p>
+                <p className="text-xs text-gray-400">{role === 'admin' ? 'Full Access' : 'Read Only'}</p>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 overflow-y-auto">
           {activeTab === 'dashboard' && <Dashboard />}
           {activeTab === 'transactions' && <Transactions />}
           {activeTab === 'insights' && <Insights />}
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
-}
+};
 
 export default App;
