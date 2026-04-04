@@ -2,6 +2,12 @@
 
 A modern, responsive finance dashboard built with React, Redux Toolkit, and Tailwind CSS. This project showcases advanced frontend development skills including state management, data visualization, role-based access control, and professional UI design.
 
+## 🌐 Live Demo
+
+**Deploy Link**: [https://zorvyn-six-xi.vercel.app/](https://zorvyn-six-xi.vercel.app/)
+
+Experience the Finance Dashboard with a professional dark theme inspired by fintech design principles. All features are fully functional including CRUD operations, advanced filtering, data export, and comprehensive analytics.
+
 ## ✨ Features
 
 ### Dashboard Overview
@@ -10,37 +16,44 @@ A modern, responsive finance dashboard built with React, Redux Toolkit, and Tail
 - **Real-time Updates**: All metrics update dynamically based on transaction data
 
 ### Transactions Management
-- **Comprehensive Table**: Sortable and filterable transaction list with pagination
-- **Advanced Filtering**: Filter by category, type (income/expense), date range, and search
+- **Comprehensive Table**: Sortable and filterable transaction list
+- **Advanced Filtering**: Filter by category, type (income/expense), date range, and amount range
+- **Data Export**: Export filtered transactions to CSV or JSON formats
 - **CRUD Operations**: Add, edit, and delete transactions (Admin role only)
 - **Modal Forms**: Clean, accessible forms for transaction management
 
 ### Insights & Analytics
-- **Key Metrics**: Highest spending category, income/expense trends, average transaction value
-- **Savings Rate**: Calculated net savings percentage
-- **Visual Indicators**: Color-coded metrics with trend arrows
+- **Key Metrics**: Total balance, income, expenses, and active categories
+- **Highest Spending Category**: Identifies your biggest expense category
+- **Monthly Comparison**: Compare income and expenses between current and previous month
+- **Performance Overview**: Visual line chart of recent transaction trends
 
 ### User Experience
 - **Role-Based Access**: Switch between Viewer (read-only) and Admin (full access) roles
-- **Dark Mode**: Complete dark/light theme toggle with localStorage persistence
+- **Professional Dark Theme**: Inspired by fintech design with cyan accents and deep navy backgrounds
 - **Responsive Design**: Optimized for desktop, tablet, and mobile devices
-- **Professional UI**: Card-based layout with subtle shadows, hover effects, and smooth transitions
+- **Interactive Elements**: Smooth transitions, hover effects, and intuitive interactions
 
 ### Technical Features
-- **Global Color System**: Four customizable CSS variables for easy theming
-- **State Management**: Redux Toolkit with separate slices for transactions, filters, and roles
-- **Mock Data**: 20 sample transactions for demonstration
-- **Type Safety**: Well-structured components with consistent prop handling
+- **Professional Dark Theme**: Fintech-inspired with cyan accents and customizable CSS variables
+- **Advanced State Management**: Redux Toolkit with specialized slices for clean architecture
+- **Data Persistence**: Theme and role preferences stored in localStorage
+- **Export Functionality**: Download transaction data in CSV or JSON formats
+- **Advanced Filtering**: Multi-criteria filters with date range and amount range
+- **Responsive Charts**: Interactive Recharts with dark-themed styling
+- **Mock Data**: 20 pre-loaded sample transactions for demonstration
+- **Type-Safe Components**: Well-structured with consistent prop handling
 
 ## 🛠 Tech Stack
 
-- **Frontend Framework**: React 18 with Hooks
-- **State Management**: Redux Toolkit (synchronous actions)
-- **Styling**: Tailwind CSS with custom color variables
-- **Charts & Visualization**: Recharts library
-- **Date Handling**: date-fns for formatting and calculations
-- **Build Tool**: Vite for fast development and optimized production builds
-- **Icons**: Unicode emojis for lightweight, accessible iconography
+- **Frontend Framework**: React 19 with Hooks
+- **State Management**: Redux Toolkit with slices for transactions, filters, role, and theme
+- **Styling**: Tailwind CSS 4.2 with dark theme and custom color variables
+- **Charts & Visualization**: Recharts 3.8 for interactive charts
+- **Date Handling**: date-fns 4.1 for formatting and calculations
+- **Data Export**: PapaParse for CSV generation and JSON serialization
+- **Build Tool**: Vite 8.0 for fast development and optimized production builds
+- **Icons**: Unicode emojis and SVG icons for lightweight, accessible iconography
 
 ## 🚀 Getting Started
 
@@ -81,33 +94,31 @@ src/
 ├── components/
 │   ├── App.jsx           # Main app with sidebar navigation and layout
 │   ├── Dashboard.jsx     # Dashboard overview with cards and charts
-│   ├── Transactions.jsx  # Transaction management with table and forms
-│   ├── Insights.jsx      # Financial insights and metrics grid
-│   └── RoleSwitcher.jsx  # Role selection component
+│   ├── Transactions.jsx  # Transaction management with table, forms, and export
+│   └── Insights.jsx      # Financial insights and analytics
 ├── store/
 │   ├── index.js          # Redux store configuration
 │   └── slices/
-│       ├── transactionsSlice.js  # Transaction state management
-│       ├── filtersSlice.js       # Filter and search state
-│       └── roleSlice.js          # User role state
-├── index.css             # Global styles and CSS custom properties
-├── main.jsx             # App entry point
-└── App.css              # Component-specific styles
+│       ├── transactionsSlice.js  # Transaction CRUD state management
+│       ├── filtersSlice.js       # Filter, search, and sorting state
+│       ├── roleSlice.js          # User role (Viewer/Admin) state
+│       └── themeSlice.js         # Theme persistence state
+├── index.css             # Global styles and dark theme CSS variables
+├── main.jsx              # App entry point
+└── vite.config.js        # Vite configuration
 ```
 
 ## 🎨 Customization
 
 ### Color Theme
-The dashboard uses four CSS custom properties for easy customization:
-- `--primary`: Main brand color (#3B82F6)
-- `--secondary`: Success/accent color (#10B981)
-- `--tertiary`: Neutral text color (#6B7280)
-- `--fourth`: Warning/error color (#EF4444)
+The dashboard uses a professional dark theme with fintech-inspired styling:
+- **Primary Background**: Deep Navy (`#0a0e27`)
+- **Surface**: Slate (`#111d3d`, `#1a2847`)
+- **Accent**: Cyan (`#60A5FA`, `#0ea5e9`) for interactive elements
+- **Text**: Light Slate (`#f1f5f9`) for high contrast readability
+- **Status Colors**: Green for income, Red for expenses
 
-Update these in `src/index.css` to change the entire theme.
-
-### Dark Mode
-Dark mode is automatically persisted in localStorage and applies to all components.
+Update CSS variables in `src/index.css` to customize the theme colors.
 
 ## 📱 Responsive Design
 
@@ -156,19 +167,25 @@ This project is for educational purposes as part of a frontend development assig
 └── index.css              # Global styles
 ```
 
-## Approach and Assumptions
+## 🎯 Approach and Assumptions
 
-- **State Management**: Used Redux Toolkit for predictable state updates without async thunks, keeping it simple and synchronous.
-- **Mock Data**: Initialized with 20 sample transactions for demonstration. All operations update state in real-time.
-- **Role Simulation**: Frontend-only role switching; no backend authentication.
-- **Data Handling**: Amounts are stored as numbers (positive for income, negative for expenses in display).
-- **Edge Cases**: Handles empty data, invalid inputs, and responsive layouts.
-- **Performance**: Components re-render on state changes; no optimizations needed for this scale.
+- **State Management**: Redux Toolkit with specialized slices (transactions, filters, role, theme) for clean separation of concerns and predictable state updates.
+- **Dark Theme**: Professional fintech-inspired design with deep navy backgrounds and cyan accents for modern visual appeal and reduced eye strain.
+- **Mock Data**: Initialized with 20 sample transactions for demonstration. All CRUD operations update state in real-time.
+- **Role Simulation**: Frontend-only role switching without backend authentication; useful for demonstrating UI adaptation.
+- **Data Export**: Supports both CSV (tabular) and JSON (structured) formats for user convenience and data portability.
+- **Advanced Filtering**: Multi-criteria filtering with date range, amount range, category, and type selection for comprehensive data analysis.
+- **Responsive Architecture**: Mobile-first design approach with adaptive layouts for all screen sizes.
+- **Performance**: Optimized rendering with Redux subscriptions; no additional optimizations needed at this scale.
 
 ## Features in Detail
 
-- **Dashboard**: Calculates totals from transactions. Charts update dynamically.
-- **Transactions**: Table view with inline filters. Admin can add/edit/delete via modal.
-- **Insights**: Computed metrics from transaction data, focusing on useful observations.
+- **Dashboard**: Real-time calculations of total balance, income, and expenses. Interactive charts display balance trends and spending breakdown by category with color-coded visualization.
+  
+- **Transactions**: Full CRUD functionality with an admin-only feature set. Advanced filtering supports multiple criteria (category, type, date range, amount range). Export data to CSV or JSON formats for external analysis.
+  
+- **Insights**: Computed metrics from transaction data including highest spending category identification, monthly comparison analysis, and performance trends displayed through interactive charts.
 
-This project showcases clean code, component modularity, and user-friendly design while meeting the assignment requirements.
+- **Role-Based Access**: Seamless switching between Viewer (read-only) and Admin (full access) roles with UI elements that adapt based on selected role.
+
+This project demonstrates clean code architecture, component modularity, state management best practices, and professional UI/UX design while maintaining full functionality and responsiveness.
