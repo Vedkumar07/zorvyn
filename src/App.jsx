@@ -18,8 +18,8 @@ const App = () => {
 
   return (
     <div className="dark min-h-screen bg-slate-900">
-      <div className="flex h-screen bg-slate-900 text-slate-100">
-        <aside className="w-60 bg-slate-800 border-r border-slate-700 flex flex-col">
+      <div className="flex flex-col md:flex-row min-h-screen bg-slate-900 text-slate-100">
+        <aside className="w-full md:w-60 bg-slate-800 border-slate-700 md:border-r flex flex-col flex-shrink-0 md:h-screen md:sticky md:top-0 overflow-y-auto">
           <div className="px-6 py-5 border-b border-slate-700 bg-gradient-to-b from-slate-800 to-slate-900">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-cyan-500/30">Z</div>
