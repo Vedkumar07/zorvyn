@@ -9,13 +9,13 @@ const summaryCards = [
 ];
 
 const StatCard = ({ label, value, accent, hint }) => (
-  <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm hover:shadow-md transition">
+  <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
     <div className="flex items-center justify-between mb-4">
-      <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{label}</h2>
-      <div className="w-10 h-10 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400">•</div>
+      <h2 className="text-lg font-semibold text-slate-900">{label}</h2>
+      <div className="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-500">•</div>
     </div>
     <p className={`text-3xl font-semibold ${accent}`}>{value}</p>
-    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{hint}</p>
+    <p className="text-sm text-slate-500 mt-1">{hint}</p>
   </div>
 );
 
@@ -56,10 +56,10 @@ const Dashboard = () => {
     .slice(0, 5);
 
   return (
-    <div className="space-y-6 bg-slate-50 dark:bg-slate-950 min-h-full p-6">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
-        <h1 className="text-3xl font-semibold text-slate-900 dark:text-white">Dashboard Overview</h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-2">Track your financial health with a clean summary.</p>
+    <div className="space-y-6 bg-slate-50 min-h-full p-6">
+      <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+        <h1 className="text-3xl font-semibold text-slate-900">Dashboard Overview</h1>
+        <p className="text-slate-500 mt-2">Track your financial health with a clean summary.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -75,13 +75,13 @@ const Dashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+        <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Balance Trend</h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Monthly balance movement</p>
+              <h2 className="text-xl font-semibold text-slate-900">Balance Trend</h2>
+              <p className="text-sm text-slate-500">Monthly balance movement</p>
             </div>
-            <span className="text-sm text-slate-500 dark:text-slate-400">Line Chart</span>
+            <span className="text-sm text-slate-500">Line Chart</span>
           </div>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={balanceTrend}>
@@ -94,13 +94,13 @@ const Dashboard = () => {
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+        <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Spending Breakdown</h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Expense categories at a glance</p>
+              <h2 className="text-xl font-semibold text-slate-900">Spending Breakdown</h2>
+              <p className="text-sm text-slate-500">Expense categories at a glance</p>
             </div>
-            <span className="text-sm text-slate-500 dark:text-slate-400">Pie Chart</span>
+            <span className="text-sm text-slate-500">Pie Chart</span>
           </div>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -114,7 +114,7 @@ const Dashboard = () => {
           </ResponsiveContainer>
           <div className="grid grid-cols-2 gap-3 mt-5">
             {spendingData.map((entry, index) => (
-              <div key={entry.name} className="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
+              <div key={entry.name} className="flex items-center gap-3 text-sm text-slate-600">
                 <span className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
                 <span>{entry.name}</span>
               </div>
@@ -123,40 +123,40 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+      <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Recent Transactions</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Latest activity from your financial history.</p>
+            <h2 className="text-xl font-semibold text-slate-900">Recent Transactions</h2>
+            <p className="text-sm text-slate-500">Latest activity from your financial history.</p>
           </div>
-          <span className="text-sm text-slate-500 dark:text-slate-400">Top 5</span>
+          <span className="text-sm text-slate-500">Top 5</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[680px] text-left">
-            <thead className="bg-slate-50 dark:bg-slate-800">
+            <thead className="bg-slate-50">
               <tr>
-                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Date</th>
-                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Category</th>
-                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Type</th>
-                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Amount</th>
-                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Description</th>
+                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Date</th>
+                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Category</th>
+                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Type</th>
+                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Amount</th>
+                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Description</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+            <tbody className="divide-y divide-slate-200">
               {recentTransactions.map((transaction) => (
-                <tr key={transaction.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                  <td className="px-5 py-4 text-sm text-slate-900 dark:text-slate-100">{format(new Date(transaction.date), 'MMM dd, yyyy')}</td>
-                  <td className="px-5 py-4 text-sm text-slate-900 dark:text-slate-100">{transaction.category}</td>
-                  <td className="px-5 py-4 text-sm capitalize text-slate-900 dark:text-slate-100">{transaction.type}</td>
+                <tr key={transaction.id} className="hover:bg-slate-50 transition-colors">
+                  <td className="px-5 py-4 text-sm text-slate-900">{format(new Date(transaction.date), 'MMM dd, yyyy')}</td>
+                  <td className="px-5 py-4 text-sm text-slate-900">{transaction.category}</td>
+                  <td className="px-5 py-4 text-sm capitalize text-slate-900">{transaction.type}</td>
                   <td className={`px-5 py-4 text-sm font-semibold ${transaction.type === 'income' ? 'text-green-600' : 'text-red-500'}`}>
                     ${Math.abs(transaction.amount).toFixed(2)}
                   </td>
-                  <td className="px-5 py-4 text-sm text-slate-500 dark:text-slate-400">{transaction.description}</td>
+                  <td className="px-5 py-4 text-sm text-slate-500">{transaction.description}</td>
                 </tr>
               ))}
               {recentTransactions.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="px-5 py-8 text-center text-sm text-slate-500 dark:text-slate-400">No recent transactions available.</td>
+                  <td colSpan="5" className="px-5 py-8 text-center text-sm text-slate-500">No recent transactions available.</td>
                 </tr>
               )}
             </tbody>
