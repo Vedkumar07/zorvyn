@@ -9,13 +9,13 @@ const summaryCards = [
 ];
 
 const StatCard = ({ label, value, accent, hint }) => (
-  <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition">
+  <div className="bg-slate-800 rounded-3xl border border-slate-700 p-6 shadow-sm hover:shadow-lg hover:border-cyan-500/50 transition hover:bg-slate-800/80">
     <div className="flex items-center justify-between mb-4">
-      <h2 className="text-lg font-semibold text-slate-900">{label}</h2>
-      <div className="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-500">•</div>
+      <h2 className="text-lg font-semibold text-slate-100">{label}</h2>
+      <div className="w-10 h-10 rounded-2xl bg-slate-700 flex items-center justify-center text-slate-400">•</div>
     </div>
     <p className={`text-3xl font-semibold ${accent}`}>{value}</p>
-    <p className="text-sm text-slate-500 mt-1">{hint}</p>
+    <p className="text-sm text-slate-400 mt-1">{hint}</p>
   </div>
 );
 
@@ -56,10 +56,10 @@ const Dashboard = () => {
     .slice(0, 5);
 
   return (
-    <div className="space-y-6 bg-slate-50 min-h-full p-6">
-      <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
-        <h1 className="text-3xl font-semibold text-slate-900">Dashboard Overview</h1>
-        <p className="text-slate-500 mt-2">Track your financial health with a clean summary.</p>
+    <div className="space-y-6 bg-slate-900 min-h-full p-6">
+      <div className="bg-slate-800 rounded-3xl border border-slate-700 p-6 shadow-sm">
+        <h1 className="text-3xl font-semibold text-slate-100">Dashboard Overview</h1>
+        <p className="text-slate-400 mt-2">Track your financial health with a clean summary.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -75,32 +75,32 @@ const Dashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+        <div className="bg-slate-800 rounded-3xl border border-slate-700 p-6 shadow-sm">
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h2 className="text-xl font-semibold text-slate-900">Balance Trend</h2>
-              <p className="text-sm text-slate-500">Monthly balance movement</p>
+              <h2 className="text-xl font-semibold text-slate-100">Balance Trend</h2>
+              <p className="text-sm text-slate-400">Monthly balance movement</p>
             </div>
-            <span className="text-sm text-slate-500">Line Chart</span>
+            <span className="text-sm text-slate-400">Line Chart</span>
           </div>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={balanceTrend}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
-              <XAxis dataKey="date" stroke="#64748B" tick={{ fontSize: 11 }} />
-              <YAxis stroke="#64748B" tick={{ fontSize: 11 }} />
-              <Tooltip contentStyle={{ borderRadius: 16, boxShadow: '0 10px 30px rgba(15,23,42,0.08)' }} formatter={(value) => [`$${value.toFixed(2)}`, 'Balance']} />
-              <Line type="monotone" dataKey="balance" stroke="#3B82F6" strokeWidth={3} dot={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+              <XAxis dataKey="date" stroke="#94a3b8" tick={{ fontSize: 11 }} />
+              <YAxis stroke="#94a3b8" tick={{ fontSize: 11 }} />
+              <Tooltip contentStyle={{ borderRadius: 16, backgroundColor: '#1e293b', border: '1px solid #475569', color: '#f1f5f9' }} formatter={(value) => [`$${value.toFixed(2)}`, 'Balance']} />
+              <Line type="monotone" dataKey="balance" stroke="#60A5FA" strokeWidth={3} dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+        <div className="bg-slate-800 rounded-3xl border border-slate-700 p-6 shadow-sm">
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h2 className="text-xl font-semibold text-slate-900">Spending Breakdown</h2>
-              <p className="text-sm text-slate-500">Expense categories at a glance</p>
+              <h2 className="text-xl font-semibold text-slate-100">Spending Breakdown</h2>
+              <p className="text-sm text-slate-400">Expense categories at a glance</p>
             </div>
-            <span className="text-sm text-slate-500">Pie Chart</span>
+            <span className="text-sm text-slate-400">Pie Chart</span>
           </div>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -109,12 +109,12 @@ const Dashboard = () => {
                   <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip contentStyle={{ borderRadius: 16, boxShadow: '0 10px 30px rgba(15,23,42,0.08)' }} formatter={(value) => [`$${value.toFixed(2)}`, 'Spent']} />
+              <Tooltip contentStyle={{ borderRadius: 16, backgroundColor: '#1e293b', border: '1px solid #475569', color: '#f1f5f9' }} formatter={(value) => [`$${value.toFixed(2)}`, 'Spent']} />
             </PieChart>
           </ResponsiveContainer>
           <div className="grid grid-cols-2 gap-3 mt-5">
             {spendingData.map((entry, index) => (
-              <div key={entry.name} className="flex items-center gap-3 text-sm text-slate-600">
+              <div key={entry.name} className="flex items-center gap-3 text-sm text-slate-400">
                 <span className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
                 <span>{entry.name}</span>
               </div>
@@ -123,40 +123,40 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+      <div className="bg-slate-800 rounded-3xl border border-slate-700 p-6 shadow-sm">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="text-xl font-semibold text-slate-900">Recent Transactions</h2>
-            <p className="text-sm text-slate-500">Latest activity from your financial history.</p>
+            <h2 className="text-xl font-semibold text-slate-100">Recent Transactions</h2>
+            <p className="text-sm text-slate-400">Latest activity from your financial history.</p>
           </div>
-          <span className="text-sm text-slate-500">Top 5</span>
+          <span className="text-sm text-slate-400">Top 5</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[680px] text-left">
-            <thead className="bg-slate-50">
+            <thead className="bg-slate-700 border-b border-slate-600">
               <tr>
-                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Date</th>
-                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Category</th>
-                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Type</th>
-                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Amount</th>
-                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Description</th>
+                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-300">Date</th>
+                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-300">Category</th>
+                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-300">Type</th>
+                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-300">Amount</th>
+                <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-300">Description</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200">
+            <tbody className="divide-y divide-slate-700">
               {recentTransactions.map((transaction) => (
-                <tr key={transaction.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-5 py-4 text-sm text-slate-900">{format(new Date(transaction.date), 'MMM dd, yyyy')}</td>
-                  <td className="px-5 py-4 text-sm text-slate-900">{transaction.category}</td>
-                  <td className="px-5 py-4 text-sm capitalize text-slate-900">{transaction.type}</td>
-                  <td className={`px-5 py-4 text-sm font-semibold ${transaction.type === 'income' ? 'text-green-600' : 'text-red-500'}`}>
+                <tr key={transaction.id} className="hover:bg-slate-700/50 transition-colors">
+                  <td className="px-5 py-4 text-sm text-slate-200">{format(new Date(transaction.date), 'MMM dd, yyyy')}</td>
+                  <td className="px-5 py-4 text-sm text-slate-200">{transaction.category}</td>
+                  <td className="px-5 py-4 text-sm capitalize text-slate-200">{transaction.type}</td>
+                  <td className={`px-5 py-4 text-sm font-semibold ${transaction.type === 'income' ? 'text-green-400' : 'text-red-400'}`}>
                     ${Math.abs(transaction.amount).toFixed(2)}
                   </td>
-                  <td className="px-5 py-4 text-sm text-slate-500">{transaction.description}</td>
+                  <td className="px-5 py-4 text-sm text-slate-400">{transaction.description}</td>
                 </tr>
               ))}
               {recentTransactions.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="px-5 py-8 text-center text-sm text-slate-500">No recent transactions available.</td>
+                  <td colSpan="5" className="px-5 py-8 text-center text-sm text-slate-400">No recent transactions available.</td>
                 </tr>
               )}
             </tbody>

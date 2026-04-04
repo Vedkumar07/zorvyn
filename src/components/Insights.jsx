@@ -139,16 +139,16 @@ const Insights = () => {
 
   if (!hasData) {
     return (
-      <div className="space-y-6 bg-slate-50 min-h-full p-6">
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="space-y-6 bg-slate-900 min-h-full p-6">
+        <div className="rounded-3xl border border-slate-700 bg-slate-800 p-6 shadow-sm">
           <div className="text-center py-12">
-            <div className="mx-auto h-24 w-24 text-slate-400">
+            <div className="mx-auto h-24 w-24 text-slate-600">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
-            <h3 className="mt-4 text-lg font-medium text-slate-900">No insights available</h3>
-            <p className="mt-2 text-sm text-slate-500">Add some transactions to see your financial insights and analytics.</p>
+            <h3 className="mt-4 text-lg font-medium text-slate-100">No insights available</h3>
+            <p className="mt-2 text-sm text-slate-400">Add some transactions to see your financial insights and analytics.</p>
           </div>
         </div>
       </div>
@@ -156,12 +156,12 @@ const Insights = () => {
   }
 
   return (
-    <div className="space-y-6 bg-slate-50 min-h-full p-6">
+    <div className="space-y-6 bg-slate-900 min-h-full p-6">
       <div className="grid gap-6 lg:grid-cols-4">
         {metricCards.map((card) => (
-          <div key={card.key} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <p className="text-sm font-medium uppercase tracking-wide text-slate-500">{card.title}</p>
-            <p className="mt-4 text-3xl font-semibold text-slate-900">
+          <div key={card.key} className="rounded-3xl border border-slate-700 bg-slate-800 p-6 shadow-sm hover:border-cyan-500/50 transition-colors">
+            <p className="text-sm font-medium uppercase tracking-wide text-slate-400">{card.title}</p>
+            <p className="mt-4 text-3xl font-semibold text-slate-100">
               {card.prefix || ''}{card.format ? card.format(insights.summary[card.key]) : insights.summary[card.key]}{card.suffix || ''}
             </p>
           </div>
@@ -169,43 +169,43 @@ const Insights = () => {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="rounded-3xl border border-slate-700 bg-slate-800 p-6 shadow-sm">
           <div className="flex items-center justify-between gap-4 pb-4">
             <div>
-              <h2 className="text-2xl font-semibold text-slate-900">Highest Spending Category</h2>
-              <p className="text-sm text-slate-500">Your biggest expense category this period.</p>
+              <h2 className="text-2xl font-semibold text-slate-100">Highest Spending Category</h2>
+              <p className="text-sm text-slate-400">Your biggest expense category this period.</p>
             </div>
           </div>
           <div className="text-center py-8">
             {insights.highestSpendingCategory ? (
               <div>
-                <div className="text-4xl font-bold text-slate-900">{insights.highestSpendingCategory[0]}</div>
-                <div className="mt-2 text-lg text-slate-600">${insights.highestSpendingCategory[1].toFixed(2)}</div>
-                <div className="mt-1 text-sm text-slate-500">Total spent</div>
+                <div className="text-4xl font-bold text-slate-100">{insights.highestSpendingCategory[0]}</div>
+                <div className="mt-2 text-lg text-slate-300">${insights.highestSpendingCategory[1].toFixed(2)}</div>
+                <div className="mt-1 text-sm text-slate-400">Total spent</div>
               </div>
             ) : (
-              <div className="text-slate-500">No expense data available</div>
+              <div className="text-slate-400">No expense data available</div>
             )}
           </div>
         </div>
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="rounded-3xl border border-slate-700 bg-slate-800 p-6 shadow-sm">
           <div className="flex items-center justify-between gap-4 pb-4">
             <div>
-              <h2 className="text-2xl font-semibold text-slate-900">Monthly Comparison</h2>
-              <p className="text-sm text-slate-500">Compare current vs previous month performance.</p>
+              <h2 className="text-2xl font-semibold text-slate-100">Monthly Comparison</h2>
+              <p className="text-sm text-slate-400">Compare current vs previous month performance.</p>
             </div>
           </div>
           <div className="space-y-4">
             {insights.monthlyComparison.map((month) => (
-              <div key={month.month} className="flex items-center justify-between p-3 rounded-lg bg-slate-50">
+              <div key={month.month} className="flex items-center justify-between p-3 rounded-lg bg-slate-700/50">
                 <div>
-                  <div className="font-medium text-slate-900">{month.month}</div>
-                  <div className="text-sm text-slate-600">
+                  <div className="font-medium text-slate-100">{month.month}</div>
+                  <div className="text-sm text-slate-400">
                     Income: ${month.income.toFixed(2)} | Expense: ${month.expense.toFixed(2)}
                   </div>
                 </div>
-                <div className={`text-lg font-semibold ${month.net >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                <div className={`text-lg font-semibold ${month.net >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                   ${month.net.toFixed(2)}
                 </div>
               </div>
@@ -214,21 +214,21 @@ const Insights = () => {
         </div>
       </div>
 
-      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="rounded-3xl border border-slate-700 bg-slate-800 p-6 shadow-sm">
         <div className="flex items-center justify-between gap-4 pb-4">
           <div>
-            <h2 className="text-2xl font-semibold text-slate-900">Performance Overview</h2>
-            <p className="text-sm text-slate-500">Recent transaction trend for the last 10 entries.</p>
+            <h2 className="text-2xl font-semibold text-slate-100">Performance Overview</h2>
+            <p className="text-sm text-slate-400">Recent transaction trend for the last 10 entries.</p>
           </div>
         </div>
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={insights.chartData} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
-              <XAxis dataKey="date" tick={{ fill: '#64748B', fontSize: 12 }} />
-              <YAxis tick={{ fill: '#64748B', fontSize: 12 }} />
-              <Tooltip contentStyle={{ borderRadius: '1rem', border: '1px solid #CBD5E1', backgroundColor: '#0F172A', color: '#fff' }} />
-              <Line type="monotone" dataKey="amount" stroke="#2563EB" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+              <XAxis dataKey="date" tick={{ fill: '#94a3b8', fontSize: 12 }} />
+              <YAxis tick={{ fill: '#94a3b8', fontSize: 12 }} />
+              <Tooltip contentStyle={{ borderRadius: '1rem', border: '1px solid #475569', backgroundColor: '#1e293b', color: '#f1f5f9' }} />
+              <Line type="monotone" dataKey="amount" stroke="#60A5FA" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
